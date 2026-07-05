@@ -1,0 +1,111 @@
+/* Homepage specific styles */
+.home-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: var(--spacing-8) var(--spacing-4);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.hero-section {
+  text-align: center;
+  margin-bottom: var(--spacing-12);
+  animation: fadeInDown 0.6s ease-out;
+}
+
+.hero-icon {
+  font-size: 3rem;
+  margin-bottom: var(--spacing-4);
+  display: inline-block;
+}
+
+.main-title {
+  font-size: 3rem;
+  font-weight: 700;
+  margin-bottom: var(--spacing-4);
+  color: var(--text-primary);
+}
+
+.subtitle {
+  font-size: 1.25rem;
+  color: var(--text-secondary);
+  max-width: 600px;
+  margin: 0 auto;
+  line-height: 1.8;
+}
+
+.persona-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--spacing-8);
+  width: 100%;
+  max-width: 1000px;
+}
+
+.persona-card {
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-8);
+  text-align: center;
+  transition: all var(--transition-normal);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-decoration: none;
+  color: inherit;
+  box-shadow: var(--shadow-sm);
+  position: relative;
+  overflow: hidden;
+}
+
+.persona-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--color-orange-500);
+  box-shadow: var(--shadow-glow);
+}
+
+.avatar {
+  width: 100px;
+  height: 100px;
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  margin-bottom: var(--spacing-4);
+  border: 3px solid var(--bg-tertiary);
+  transition: border-color var(--transition-normal);
+}
+
+.persona-card:hover .avatar {
+  border-color: var(--color-orange-500);
+}
+
+.avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.persona-name {
+  font-family: var(--font-heading);
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: var(--spacing-1);
+}
+
+.persona-title {
+  color: var(--color-orange-500);
+  font-size: 0.9rem;
+  font-weight: 500;
+  margin-bottom: var(--spacing-4);
+}
+
+.specialties {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--spacing-2);
+  margin-top: auto;
+}

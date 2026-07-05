@@ -1,0 +1,241 @@
+/* UI Components */
+
+/* Buttons */
+.icon-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  padding: var(--spacing-2);
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+  cursor: pointer;
+}
+
+.icon-btn:hover {
+  background-color: var(--bg-tertiary);
+  color: var(--text-primary);
+}
+
+.icon-btn.danger:hover {
+  background-color: rgba(220, 53, 69, 0.1);
+  color: #dc3545;
+}
+
+.send-btn {
+  background-color: var(--color-orange-500);
+  color: white;
+  border: none;
+  border-radius: var(--radius-md);
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color var(--transition-fast), transform 0.1s;
+  flex-shrink: 0;
+}
+
+.send-btn:hover {
+  background-color: var(--color-orange-600);
+}
+
+.send-btn:active {
+  transform: scale(0.95);
+}
+
+.send-btn:disabled {
+  background-color: var(--bg-tertiary);
+  color: var(--text-muted);
+  cursor: not-allowed;
+}
+
+/* Badges / Chips */
+.badge {
+  background-color: var(--bg-tertiary);
+  color: var(--text-secondary);
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  font-weight: 500;
+  border: 1px solid var(--border-color);
+}
+
+.suggestion-chip {
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  padding: var(--spacing-2) var(--spacing-4);
+  border-radius: var(--radius-full);
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.suggestion-chip:hover {
+  border-color: var(--color-orange-500);
+  color: var(--color-orange-500);
+  background-color: rgba(232, 124, 72, 0.05);
+}
+
+/* Avatars */
+.avatar-sm {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-full);
+  object-fit: cover;
+  border: 2px solid var(--border-color);
+}
+
+/* Status Indicator */
+.status-indicator {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  background-color: #28a745;
+  border-radius: 50%;
+  display: inline-block;
+  box-shadow: 0 0 5px rgba(40, 167, 69, 0.5);
+}
+
+/* Modal / Dialog */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--transition-fast);
+}
+
+.modal-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.modal-content {
+  background-color: var(--bg-secondary);
+  padding: var(--spacing-6);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-md);
+  max-width: 400px;
+  width: 90%;
+  transform: translateY(20px);
+  transition: transform var(--transition-fast);
+}
+
+.modal-overlay.active .modal-content {
+  transform: translateY(0);
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--spacing-3);
+  margin-top: var(--spacing-6);
+}
+
+.btn-secondary {
+  padding: var(--spacing-2) var(--spacing-4);
+  background-color: var(--bg-tertiary);
+  color: var(--text-primary);
+  border-radius: var(--radius-md);
+  font-weight: 500;
+}
+
+.btn-primary {
+  padding: var(--spacing-2) var(--spacing-4);
+  background-color: var(--color-orange-500);
+  color: white;
+  border-radius: var(--radius-md);
+  font-weight: 500;
+}
+
+.btn-danger {
+  padding: var(--spacing-2) var(--spacing-4);
+  background-color: #dc3545;
+  color: white;
+  border-radius: var(--radius-md);
+  font-weight: 500;
+}
+
+/* Mentor Toggle Checkbox */
+.mentor-checkbox {
+  --toggle-size: 16px;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  width: 5em;
+  height: 2.5em;
+  background: var(--bg-tertiary);
+  -webkit-transition: 0.4s;
+  -o-transition: 0.4s;
+  transition: 0.4s;
+  border-radius: 99em;
+  position: relative;
+  cursor: pointer;
+  font-size: var(--toggle-size);
+  border: 1px solid var(--border-color);
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+  margin: 0;
+  vertical-align: middle;
+}
+
+.mentor-checkbox::before,
+.mentor-checkbox::after {
+  content: "";
+  width: 2em;
+  height: 2em;
+  position: absolute;
+  top: 0.20em;
+  left: 0.25em;
+  background-size: cover;
+  background-position: center;
+  border-radius: 50%;
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+}
+
+.mentor-checkbox::before {
+  background-image: url('/images/hitesh_choudhary.jpg');
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.mentor-checkbox::after {
+  background-image: url('/images/piyush_garg.jpg');
+  opacity: 0;
+  transform: translateX(0);
+}
+
+.mentor-checkbox:checked::before {
+  opacity: 0;
+  transform: translateX(2.5em);
+}
+
+.mentor-checkbox:checked::after {
+  opacity: 1;
+  transform: translateX(2.5em);
+}

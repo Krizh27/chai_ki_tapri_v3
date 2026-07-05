@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chat with <%= persona === 'hitesh' ? 'Hitesh Choudhary' : 'Piyush Garg' %></title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&family=Sora:wght@600;700&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="/css/variables.css">
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/themes.css">
+  <link rel="stylesheet" href="/css/animations.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="stylesheet" href="/css/chat.css">
+  <link rel="stylesheet" href="/css/sidebar.css">
+  <link rel="stylesheet" href="/css/pixel-chai.css">
+  
+  <!-- Marked.js for markdown rendering -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+  <!-- Clerk Auth -->
+  <script>
+    const pubKey = "<%= clerkPublishableKey %>";
+    const script = document.createElement('script');
+    script.setAttribute('data-clerk-publishable-key', pubKey);
+    script.async = true;
+    script.src = 'https://cdn.jsdelivr.net/npm/@clerk/clerk-js@latest/dist/clerk.browser.js';
+    script.crossOrigin = 'anonymous';
+    
+    script.addEventListener('load', async function() {
+      try {
+        await window.Clerk.load();
+        
+        if (!window.Clerk.user) {
+          window.Clerk.redirectToSignIn({ returnBackUrl: window.location.href });
+        } else {
+          // Manual name population for the profile link in sidebar
+          const nameDisplay = document.getElementById('user-name-display');
+          const emailDisplay = document.getElementById('user-email-display');
+          const avatarContainer = document.getElementById('profile-card-avatar');
+          
+          if (window.Clerk.user) {
+            if (nameDisplay) {
+              nameDisplay.textContent = window.Clerk.user.fullName || window.Clerk.user.firstName || 'My Profile';
+            }
+            if (emailDisplay) {
+              emailDisplay.textContent = window.Clerk.user.primaryEmailAddress?.emailAddress || 'Account settings';
+            }
+            if (avatarContainer && window.Clerk.user.imageUrl) {
+              avatarContainer.innerHTML = `<img src="${window.Clerk.user.imageUrl}" alt="Avatar" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">`;
+            }
+          }
+        }
+      } catch (err) {
+        console.error('Error loading Clerk:', err);
+      }
+    });
+    document.head.appendChild(script);
+  </script>
+</head>
+<body class="dark-theme">
+  <input type="hidden" id="persona-id" value="<%= persona %>">
+  
+  <div class="global-wrapper" style="display: flex; flex-direction: column; height: 100vh; background: var(--bg-primary);">
+    <!-- Top Global Header -->
+    <header class="app-top-header" style="display: flex; justify-content: space-between; align-items: center; padding: 20px 24px; flex-shrink: 0; flex-wrap: wrap; gap: 12px;">
+      <a href="/" class="logo-section" style="display: flex; align-items: center; gap: 12px; text-decoration: none;">
+        <div style="font-size: 2rem; background: transparent; border-radius: 50%; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; box-shadow: none; color: var(--color-orange-500);">
+          <svg viewBox="0 0 56.106 56.106" width="44" height="44" fill="currentColor">
+            <g>
+              <path d="M6.553,30.003c-1.6-2.5-3.2-6.3-2.4-9c0.4-1.3,1.5-2.2,2.7-2.2c0.6,0,1.3,0.2,1.9,0.7 c0.6,0.5,1.1,1.2,1.5,1.9c0.2,0.3,0.4,0.6,0.6,0.8c1-1.6,2.3-3,3.9-4.3c-0.9-0.3-1.9-0.7-3-1.4c-1.7-1.1-3.8-1.8-5.7-1.8 c-1.6,0-4.6,0.5-5.7,4.1c-1,3.1,0.1,9.4,3.6,14.1c1.2,1.6,3,3.5,5.5,4.5c-0.9-1.7-1.5-3.6-1.6-5.7 C7.353,31.203,6.953,30.603,6.553,30.003z"/>
+              <path d="M29.053,46.103c-4.8,0-9.7-1-13.6-3c-0.3,0.4-0.4,0.7-0.4,1.1c0,2.6,7,4,13.9,4s13.9-1.4,13.9-4 c0-0.3-0.1-0.7-0.4-1C38.753,45.103,33.853,46.103,29.053,46.103z"/>
+              <path d="M29.353,7.903c-1.7,0-3.1,0.7-3.1,2.8h6.1C32.453,8.603,31.053,7.903,29.353,7.903z"/>
+              <path d="M55.553,15.403c-1.2-0.2-3.4-0.4-4.7,0.1c-1.8,0.7-2.6,2.2-3.6,3.4c-0.8,1-0.9,0.8-3.4,0.8 c-1.3-1.3-2.8-2.5-4.4-3.4c1.7-0.5,2.7-1.1,2.7-1.8c0-1.6-5.7-2.9-12.7-2.9s-12.7,1.3-12.7,2.9c0,0.6,0.9,1.2,2.5,1.7l0,0 c4.2,1.2,10.6,0.9,10.6,0.9s-3,1.9-13.8,1.1c-4.2,3.2-7.1,7.8-7.1,13c-0.1,9.5,10.1,13.8,20.1,13.8c10.1,0,20.2-4.3,20.2-13.8 c0-1.2-0.2-2.3-0.4-3.4c0.5-0.4,0.8-1.1,0.8-1.1c0.4-0.7,2.1-7,3.9-9c0.6-0.7,1.3-1.1,1.9-1.4 C56.253,15.803,56.353,15.503,55.553,15.403z"/>
+            </g>
+          </svg>
+        </div>
+        <div>
+          <h1 style="font-size: 1.25rem; font-weight: 600; color: var(--color-orange-500); margin: 0; line-height: 1.2;">Chai ki Tapri</h1>
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0;">Pull up a chair. Grab a chai. Let's talk tech.</p>
+        </div>
+      </a>
+      <div class="header-actions" style="display: flex; align-items: center; gap: 12px;">
+        <% if (persona !== 'adda') { %>
+          <div class="persona-segmented-control hide-on-mobile" style="display: flex; background: var(--bg-tertiary); border-radius: 20px; padding: 4px; border: 1px solid var(--border-color);">
+            <button class="segment-btn <%= persona === 'hitesh' ? 'active' : '' %>" data-persona="hitesh" style="background: <%= persona === 'hitesh' ? 'var(--bg-secondary)' : 'transparent' %>; border: none; padding: 4px 12px; border-radius: 16px; font-size: 0.85rem; font-weight: 600; cursor: pointer; color: <%= persona === 'hitesh' ? 'var(--text-primary)' : 'var(--text-secondary)' %>; transition: 0.2s; box-shadow: <%= persona === 'hitesh' ? 'var(--shadow-sm)' : 'none' %>;">Hitesh</button>
+            <button class="segment-btn <%= persona === 'piyush' ? 'active' : '' %>" data-persona="piyush" style="background: <%= persona === 'piyush' ? 'var(--bg-secondary)' : 'transparent' %>; border: none; padding: 4px 12px; border-radius: 16px; font-size: 0.85rem; font-weight: 600; cursor: pointer; color: <%= persona === 'piyush' ? 'var(--text-primary)' : 'var(--text-secondary)' %>; transition: 0.2s; box-shadow: <%= persona === 'piyush' ? 'var(--shadow-sm)' : 'none' %>;">Piyush</button>
+          </div>
+        <% } %>
+        <div id="usage-badge" title="Remaining Daily Chats" style="background: rgba(255,165,0,0.1); color: var(--color-orange-500); padding: 4px 10px; border-radius: 16px; font-size: 0.75rem; font-weight: 600; border: 1px solid rgba(255,165,0,0.3); display: none; align-items: center; gap: 6px;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+          <span id="usage-text">Loading...</span>
+        </div>
+        <button id="theme-toggle" class="icon-btn" title="Toggle Theme" style="border: 1px solid var(--border-color); border-radius: var(--radius-full); padding: 6px 12px; display: flex; align-items: center; justify-content: center;">
+          <!-- SVG injected by JS -->
+        </button>
+        <button id="reset-chat-btn" class="icon-btn" title="Reset Chat" style="border: 1px solid var(--border-color); border-radius: var(--radius-full); padding: 6px 16px; display: flex; align-items: center; gap: 8px; font-weight: 500;">
+          <svg width="16" height="16" fill="currentColor" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"><path d="M27,8H6.83l3.58-3.59L9,3,3,9l6,6,1.41-1.41L6.83,10H27V26H7V19H5v7a2,2,0,0,0,2,2H27a2,2,0,0,0,2-2V10A2,2,0,0,0,27,8Z"/></svg>
+          <span class="hide-on-mobile">Reset Chat</span>
+        </button>
+      </div>
+    </header>
+
+    <div class="app-layout" style="display: flex; flex: 1; overflow: hidden; padding: 0 24px 24px 24px; gap: 16px; position: relative;">
+    <!-- Sidebar Overlay for mobile -->
+    <div id="sidebar-overlay" class="sidebar-overlay"></div>
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar" style="display: flex; flex-direction: column;">
+      <div class="sidebar-header" style="position: relative;">
+        <button id="new-chat-btn" class="new-chat-btn">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 14V7C20 5.34315 18.6569 4 17 4H12M20 14L13.5 20M20 14H15.5C14.3954 14 13.5 14.8954 13.5 16V20M13.5 20H7C5.34315 20 4 18.6569 4 17V12" />
+            <path d="M7 4V7M7 10V7M7 7H4M7 7H10" />
+          </svg>
+          New Chai Session
+        </button>
+        <!-- Dropdown Menu -->
+        <div id="new-chat-dropdown" class="dropdown-menu">
+          <div class="dropdown-item" data-persona="hitesh">
+            <img src="/images/hitesh_choudhary.jpg" class="dropdown-icon" alt="Hitesh">
+            Hitesh
+          </div>
+          <div class="dropdown-item" data-persona="piyush">
+            <img src="/images/piyush_garg.jpg" class="dropdown-icon" alt="Piyush">
+            Piyush
+          </div>
+          <div class="dropdown-item" data-persona="adda">
+            <div class="dropdown-icon" style="background:transparent; display:flex; align-items:center; justify-content:center; color: var(--color-orange-500);">
+              <svg viewBox="0 0 56.106 56.106" width="22" height="22" fill="currentColor">
+                <g>
+                  <path d="M6.553,30.003c-1.6-2.5-3.2-6.3-2.4-9c0.4-1.3,1.5-2.2,2.7-2.2c0.6,0,1.3,0.2,1.9,0.7 c0.6,0.5,1.1,1.2,1.5,1.9c0.2,0.3,0.4,0.6,0.6,0.8c1-1.6,2.3-3,3.9-4.3c-0.9-0.3-1.9-0.7-3-1.4c-1.7-1.1-3.8-1.8-5.7-1.8 c-1.6,0-4.6,0.5-5.7,4.1c-1,3.1,0.1,9.4,3.6,14.1c1.2,1.6,3,3.5,5.5,4.5c-0.9-1.7-1.5-3.6-1.6-5.7 C7.353,31.203,6.953,30.603,6.553,30.003z"/>
+                  <path d="M29.053,46.103c-4.8,0-9.7-1-13.6-3c-0.3,0.4-0.4,0.7-0.4,1.1c0,2.6,7,4,13.9,4s13.9-1.4,13.9-4 c0-0.3-0.1-0.7-0.4-1C38.753,45.103,33.853,46.103,29.053,46.103z"/>
+                  <path d="M29.353,7.903c-1.7,0-3.1,0.7-3.1,2.8h6.1C32.453,8.603,31.053,7.903,29.353,7.903z"/>
+                  <path d="M55.553,15.403c-1.2-0.2-3.4-0.4-4.7,0.1c-1.8,0.7-2.6,2.2-3.6,3.4c-0.8,1-0.9,0.8-3.4,0.8 c-1.3-1.3-2.8-2.5-4.4-3.4c1.7-0.5,2.7-1.1,2.7-1.8c0-1.6-5.7-2.9-12.7-2.9s-12.7,1.3-12.7,2.9c0,0.6,0.9,1.2,2.5,1.7l0,0 c4.2,1.2,10.6,0.9,10.6,0.9s-3,1.9-13.8,1.1c-4.2,3.2-7.1,7.8-7.1,13c-0.1,9.5,10.1,13.8,20.1,13.8c10.1,0,20.2-4.3,20.2-13.8 c0-1.2-0.2-2.3-0.4-3.4c0.5-0.4,0.8-1.1,0.8-1.1c0.4-0.7,2.1-7,3.9-9c0.6-0.7,1.3-1.1,1.9-1.4 C56.253,15.803,56.353,15.503,55.553,15.403z"/>
+                </g>
+              </svg>
+            </div>
+            Chai Adda <span style="font-size: 0.8em; color: var(--color-orange-500); margin-left: 4px;">(beta)</span>
+          </div>
+        </div>
+
+        <% if (persona !== 'adda') { %>
+          <div class="persona-segmented-control show-on-mobile-only" style="margin-top: 16px; display: flex; background: var(--bg-tertiary); border-radius: 20px; padding: 4px; border: 1px solid var(--border-color);">
+            <button class="segment-btn <%= persona === 'hitesh' ? 'active' : '' %>" data-persona="hitesh" style="flex: 1; background: <%= persona === 'hitesh' ? 'var(--bg-secondary)' : 'transparent' %>; border: none; padding: 6px 12px; border-radius: 16px; font-size: 0.85rem; font-weight: 600; cursor: pointer; color: <%= persona === 'hitesh' ? 'var(--text-primary)' : 'var(--text-secondary)' %>; transition: 0.2s; box-shadow: <%= persona === 'hitesh' ? 'var(--shadow-sm)' : 'none' %>;">Hitesh</button>
+            <button class="segment-btn <%= persona === 'piyush' ? 'active' : '' %>" data-persona="piyush" style="flex: 1; background: <%= persona === 'piyush' ? 'var(--bg-secondary)' : 'transparent' %>; border: none; padding: 6px 12px; border-radius: 16px; font-size: 0.85rem; font-weight: 600; cursor: pointer; color: <%= persona === 'piyush' ? 'var(--text-primary)' : 'var(--text-secondary)' %>; transition: 0.2s; box-shadow: <%= persona === 'piyush' ? 'var(--shadow-sm)' : 'none' %>;">Piyush</button>
+          </div>
+        <% } %>
+      </div>
+      <div class="sidebar-content" style="overflow-y: auto; overflow-x: hidden; padding-right: 4px; margin-top: 16px; flex: 1;">
+        <div class="sidebar-title">Previous Chai Sessions</div>
+        <div id="chat-history-list" class="chat-history-list">
+          <!-- Populated by sidebar.js -->
+        </div>
+      </div>
+      <div class="sidebar-footer" style="margin-top: auto; padding-top: 16px; border-top: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 12px;">
+        <a href="/profile" class="profile-card" style="display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--text-primary); padding: 12px; border-radius: 12px; width: 100%; background: var(--bg-tertiary); border: 1px solid var(--border-color); transition: all 0.2s; box-shadow: var(--shadow-sm);" onmouseover="this.style.transform='translateY(-2px)'; this.style.borderColor='var(--color-orange-500)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.2)';" onmouseout="this.style.transform='none'; this.style.borderColor='var(--border-color)'; this.style.boxShadow='var(--shadow-sm)';">
+          <div id="profile-card-avatar" style="width: 36px; height: 36px; border-radius: 50%; background: var(--bg-secondary); border: 2px solid var(--color-orange-500); display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+          </div>
+          <div style="display: flex; flex-direction: column; overflow: hidden;">
+            <span id="user-name-display" style="font-weight: 600; font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Loading...</span>
+            <span id="user-email-display" style="font-size: 0.75rem; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"></span>
+          </div>
+        </a>
+      </div>
+    </aside>
+
+    <!-- Main Chat Area -->
+    <main class="main-chat-area" style="background: var(--bg-secondary); border-radius: 16px; border: 1px solid var(--border-color); display: flex; flex-direction: column; overflow: hidden; position: relative;">
+      
+      <!-- Pixel Chai Background (Moved inside main chat area) -->
+      <div class="pixel-chai-bg">
+        <div class="pixel-cup">
+          <div class="pixel-smoke-container">
+            <div class="pixel-smoke"></div>
+            <div class="pixel-smoke"></div>
+            <div class="pixel-smoke"></div>
+            <div class="pixel-smoke"></div>
+            <div class="pixel-smoke"></div>
+            <div class="pixel-smoke"></div>
+            <div class="pixel-smoke"></div>
+          </div>
+        </div>
+      </div>
+
+      <header class="chat-header" style="background: transparent; border-bottom: none; padding: 20px 24px; position: relative; z-index: 10;">
+        <div class="header-left">
+          <button id="sidebar-toggle" class="sidebar-toggle-btn mobile-toggle" style="background: none; border: none; padding: var(--spacing-2); color: var(--text-primary); cursor: pointer; font-size: 1.2rem;">☰</button>
+          <button id="desktop-sidebar-toggle" class="sidebar-toggle-btn desktop-toggle" title="Toggle Sidebar">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="3" x2="9" y2="21"></line></svg>
+          </button>
+          
+          <% if (persona === 'adda') { %>
+            <div class="avatar-sm" style="display:flex; align-items:center; justify-content:center; background: transparent; font-size:1.2rem; border:none; width: 40px; height: 40px; border-radius: 50%; color: var(--color-orange-500);">
+              <svg viewBox="0 0 56.106 56.106" width="38" height="38" fill="currentColor">
+                <g>
+                  <path d="M6.553,30.003c-1.6-2.5-3.2-6.3-2.4-9c0.4-1.3,1.5-2.2,2.7-2.2c0.6,0,1.3,0.2,1.9,0.7 c0.6,0.5,1.1,1.2,1.5,1.9c0.2,0.3,0.4,0.6,0.6,0.8c1-1.6,2.3-3,3.9-4.3c-0.9-0.3-1.9-0.7-3-1.4c-1.7-1.1-3.8-1.8-5.7-1.8 c-1.6,0-4.6,0.5-5.7,4.1c-1,3.1,0.1,9.4,3.6,14.1c1.2,1.6,3,3.5,5.5,4.5c-0.9-1.7-1.5-3.6-1.6-5.7 C7.353,31.203,6.953,30.603,6.553,30.003z"/>
+                  <path d="M29.053,46.103c-4.8,0-9.7-1-13.6-3c-0.3,0.4-0.4,0.7-0.4,1.1c0,2.6,7,4,13.9,4s13.9-1.4,13.9-4 c0-0.3-0.1-0.7-0.4-1C38.753,45.103,33.853,46.103,29.053,46.103z"/>
+                  <path d="M29.353,7.903c-1.7,0-3.1,0.7-3.1,2.8h6.1C32.453,8.603,31.053,7.903,29.353,7.903z"/>
+                  <path d="M55.553,15.403c-1.2-0.2-3.4-0.4-4.7,0.1c-1.8,0.7-2.6,2.2-3.6,3.4c-0.8,1-0.9,0.8-3.4,0.8 c-1.3-1.3-2.8-2.5-4.4-3.4c1.7-0.5,2.7-1.1,2.7-1.8c0-1.6-5.7-2.9-12.7-2.9s-12.7,1.3-12.7,2.9c0,0.6,0.9,1.2,2.5,1.7l0,0 c4.2,1.2,10.6,0.9,10.6,0.9s-3,1.9-13.8,1.1c-4.2,3.2-7.1,7.8-7.1,13c-0.1,9.5,10.1,13.8,20.1,13.8c10.1,0,20.2-4.3,20.2-13.8 c0-1.2-0.2-2.3-0.4-3.4c0.5-0.4,0.8-1.1,0.8-1.1c0.4-0.7,2.1-7,3.9-9c0.6-0.7,1.3-1.1,1.9-1.4 C56.253,15.803,56.353,15.503,55.553,15.403z"/>
+                </g>
+              </svg>
+            </div>
+            <div>
+              <div style="font-weight: 600; font-size: 1.1rem;">Chai Adda <span style="font-size:0.7em; color: var(--color-orange-500); background: rgba(181, 95, 48, 0.1); padding: 2px 6px; border-radius: 4px; margin-left: 6px;">BETA</span></div>
+              <div class="status-indicator" style="font-size:0.8rem; color: var(--text-muted); display: flex; align-items: center; gap: 6px;">
+                <span class="status-dot" style="background-color: #4CAF50; width: 8px; height: 8px; border-radius: 50%; display: inline-block;"></span> Mentors: Hitesh & Piyush
+              </div>
+            </div>
+          <% } else { %>
+            <img id="chat-header-avatar" src="<%= persona === 'hitesh' ? '/images/hitesh_choudhary.jpg' : '/images/piyush_garg.jpg' %>" alt="<%= persona %>" class="avatar-sm" style="width: 40px; height: 40px; border-radius: 50%; border: 2px solid var(--border-color); object-fit: cover;">
+            <div>
+              <div id="chat-header-name" style="font-weight: 600; font-size: 1.1rem;"><%= persona === 'hitesh' ? 'Hitesh Choudhary' : 'Piyush Garg' %></div>
+              <div class="status-indicator" style="font-size: 0.8rem; color: var(--text-muted); display: flex; align-items: center; gap: 6px;">
+                <span class="status-dot" style="background-color: #4CAF50; width: 8px; height: 8px; border-radius: 50%; display: inline-block;"></span> Online
+              </div>
+            </div>
+          <% } %>
+        </div>
+      </header>
+
+
+
+      <div id="messages-container" class="chat-container">
+        <!-- Messages injected by JS -->
+      </div>
+
+      <div class="input-container" style="padding: 0 24px 24px 24px; background: transparent; margin-top: auto;">
+        <div class="input-wrapper" style="background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 16px; display: flex; flex-direction: row; align-items: flex-end; padding: 8px 12px; box-shadow: var(--shadow-sm); z-index: 2; position: relative; gap: 12px;">
+          <textarea id="message-input" placeholder="Ask anything over chai..." rows="1" style="background: transparent; border: none; color: var(--text-primary); resize: none; font-family: inherit; font-size: 1rem; padding: 8px 0; min-height: 24px; max-height: 150px; outline: none; flex: 1; align-self: stretch;"></textarea>
+          <div class="input-actions" style="display: flex; align-items: center; padding-bottom: 4px;">
+            <div class="input-send-area" style="display: flex; align-items: center; gap: 12px;">
+              <span class="send-hint hide-on-mobile" style="font-size: 0.75rem; color: var(--text-muted);">Enter to send</span>
+              <button id="send-btn" class="send-btn" disabled style="background: var(--color-orange-500); color: white; border-radius: 8px; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border: none; transition: opacity 0.2s; flex-shrink: 0;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+        <% if (persona === 'adda') { %>
+          <div style="text-align: center; margin-top: 8px; font-size: 0.75rem; color: var(--text-muted);">
+            This feature is experimental and might not work properly.
+          </div>
+        <% } %>
+      </div>
+    </main>
+  </div>
+  </div>
+
+  <!-- Modular Scripts -->
+
+  <!-- Confirmation Modal -->
+  <div id="confirm-modal" class="modal-overlay">
+    <div class="modal-content">
+      <h3 id="confirm-modal-title" style="margin-top:0; margin-bottom:12px; font-size:1.1rem; font-weight:600;">Confirm Action</h3>
+      <p id="confirm-modal-message" style="color:var(--text-secondary); font-size:0.9rem; line-height:1.4; margin-bottom:24px;">Are you sure?</p>
+      <div class="modal-actions" style="margin-top:0;">
+        <button id="confirm-modal-cancel" class="btn-secondary" style="border:1px solid var(--border-color); cursor:pointer;">Cancel</button>
+        <button id="confirm-modal-confirm" class="btn-danger" style="background-color:#ff6b6b; cursor:pointer; display: flex; align-items: center; gap: 6px; justify-content: center;">
+          <svg width="18" height="18" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" fill="currentColor">
+            <path d="M160 256H96a32 32 0 0 1 0-64h256V95.936a32 32 0 0 1 32-32h256a32 32 0 0 1 32 32V192h256a32 32 0 1 1 0 64h-64v672a32 32 0 0 1-32 32H192a32 32 0 0 1-32-32V256zm448-64v-64H416v64h192zM224 896h576V256H224v640zm192-128a32 32 0 0 1-32-32V416a32 32 0 0 1 64 0v320a32 32 0 0 1-32 32zm192 0a32 32 0 0 1-32-32V416a32 32 0 0 1 64 0v320a32 32 0 0 1-32 32z"/>
+          </svg>
+          Delete
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/ui-utils.js"></script>
+  <script src="/js/storage.js"></script>
+  <script src="/js/history.js"></script>
+  <script src="/js/theme.js"></script>
+  <script src="/js/chat-ui.js"></script>
+  <script src="/js/sidebar.js"></script>
+  <script src="/js/persona-switch.js"></script>
+  <script src="/js/reset-chat.js"></script>
+  <script src="/js/main.js"></script>
+</body>
+</html>
