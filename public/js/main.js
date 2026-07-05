@@ -145,18 +145,7 @@ const ChatApp = {
       window.ChatUIManager.hideLoading(targetPersona);
       
       if (!response.ok) {
-        let errJson = null;
-        try { errJson = await response.json(); } catch(e) {}
-        
-        if (response.status === 429) {
-          const msg = errJson?.error || "You've reached your chat limit. Please try again later.";
-          window.ChatUIManager.showError(msg);
-        } else if (response.status === 401) {
-          window.ChatUIManager.showError("You need to sign in to send messages.");
-        } else {
-          window.ChatUIManager.showError("An error occurred while communicating with the mentor.");
-        }
-        throw new Error(`API returned status ${response.status}`);
+        return false;
       }
 
       const reader = response.body.getReader();
@@ -246,9 +235,11 @@ const ChatApp = {
       }
       
       window.Storage.addMessage(ChatApp.currentChatId, ChatApp.persona, targetPersona, aiFullResponse);
+      return true;
     } catch (error) {
       window.ChatUIManager.hideLoading(targetPersona);
       console.error("Fetch API Error Detailed:", error);
+      return false;
     }
   },
   
@@ -271,10 +262,17 @@ const ChatApp = {
     if (ChatApp.persona === 'adda') {
       const order = Math.random() > 0.5 ? ['hitesh', 'piyush'] : ['piyush', 'hitesh'];
       // Sequential execution so the second mentor sees the first's response in history!
-      await ChatApp.fetchMentorStream(order[0]);
-      await ChatApp.fetchMentorStream(order[1]);
+      const success1 = await ChatApp.fetchMentorStream(order[0]);
+      const success2 = await ChatApp.fetchMentorStream(order[1]);
+      
+      if (!success1 && !success2) {
+        window.ChatUIManager.appendMessage('ai', "Lagta hai developer sahab ne error handling ka lecture bunk kardiya tha 😅");
+      }
     } else {
-      await ChatApp.fetchMentorStream(ChatApp.persona);
+      const success = await ChatApp.fetchMentorStream(ChatApp.persona);
+      if (!success) {
+        window.ChatUIManager.appendMessage('ai', "Lagta hai developer sahab ne error handling ka lecture bunk kardiya tha 😅");
+      }
     }
     
     // Update limit after sending message
