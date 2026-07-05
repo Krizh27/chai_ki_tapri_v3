@@ -247,7 +247,7 @@ const ChatApp = {
     if (!window.ChatUIManager.input) return;
     
     const message = window.ChatUIManager.input.value.trim();
-    if (!message) return;
+    if (!message || message.length > 1000) return;
     
     window.ChatUIManager.input.value = '';
     window.ChatUIManager.input.disabled = true;

@@ -9,15 +9,38 @@ const ChatUIManager = {
     ChatUIManager.input = document.getElementById('message-input');
     ChatUIManager.sendBtn = document.getElementById('send-btn');
     
-    // Auto-resize textarea
+    // Auto-resize textarea and handle character limit
     if (ChatUIManager.input) {
+      const warningEl = document.createElement('div');
+      warningEl.id = 'char-limit-warning';
+      warningEl.style.color = '#ef4444';
+      warningEl.style.fontSize = '0.75rem';
+      warningEl.style.position = 'absolute';
+      warningEl.style.bottom = '-20px';
+      warningEl.style.right = '0';
+      warningEl.style.display = 'none';
+      warningEl.textContent = 'Message is too long (maximum 1000 characters)';
+      
+      // We assume the input's parent has position relative to place this correctly
+      ChatUIManager.input.parentNode.style.position = 'relative';
+      ChatUIManager.input.parentNode.appendChild(warningEl);
+
       ChatUIManager.input.addEventListener('input', function() {
         this.style.height = 'auto';
         this.style.height = (this.scrollHeight) + 'px';
         
+        const text = this.value.trim();
+        const isTooLong = text.length > 1000;
+        
+        if (isTooLong) {
+          warningEl.style.display = 'block';
+        } else {
+          warningEl.style.display = 'none';
+        }
+        
         // Enable/disable send button based on input
         if (ChatUIManager.sendBtn) {
-          ChatUIManager.sendBtn.disabled = this.value.trim() === '';
+          ChatUIManager.sendBtn.disabled = text === '' || isTooLong;
         }
       });
     }
