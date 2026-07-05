@@ -14,15 +14,15 @@ An AI-powered developer hangout where users can have realistic conversations wit
 
 ## 📸 Screenshots
 
-images/home.png
+public/images/home.png
 
-images/loading_chat.png
+public/images/loading_chat.png
 
-images/chats.png
+public/images/chats.png
 
-images/theme_toggle.png
+public/images/theme_toggle.png
 
-images/profile.png
+public/images/profile.png
 ---
 
 ## ✨ Features
